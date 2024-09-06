@@ -1,3 +1,12 @@
+/** !
+ * Deterministic Finite Automata implementation
+ * 
+ * @file fa/dfa/DFA.java
+ * 
+ * @author Jon Flores
+ * @author Jacob Smith
+ */
+
 // Package
 package fa.dfa;
 
@@ -18,6 +27,7 @@ public class DFA implements DFAInterface {
     private Map<String, State> states = null;
     private State initialState = null;
     private Set<State> finalStates = null;
+    private HashMap<Character, HashMap<String,String>> transition = null;
     
     public DFA ( )
     {
@@ -30,6 +40,9 @@ public class DFA implements DFAInterface {
 
         // Construct a collection of the final states
         this.finalStates = new HashSet<State>();
+
+        // Construct a collection of transitions
+        this.transition = new HashMap<Character, HashMap<String,String>>();
 
         // Done
     }
@@ -140,8 +153,25 @@ public class DFA implements DFAInterface {
 
     @Override
     public boolean addTransition(String fromState, String toState, char onSymb) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addTransition'");
+        
+        // TODO: Check fromState
+        // TODO: Check toState
+        // TODO: Check onSymb
+
+        // Initialized data
+        HashMap<String, String> transitions = null;
+
+        // Check if the set contains the transition character
+        if ( this.transition.containsKey(onSymb) == false )
+        
+            // Construct a transition lookup for the character
+            this.transition.put(onSymb, new HashMap<String, String>());
+        
+        // Store the transition lookup
+        this.transition.get(onSymb).put(fromState, toState);;
+
+        // Done
+        return false;
     }
 
     @Override
