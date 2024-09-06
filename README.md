@@ -1,10 +1,12 @@
 # Project 1: Deterministic Finite Automata
 
+[![Machines](https://github.com/Jacob-C-Smith/Machines/actions/workflows/make.yml/badge.svg)](https://github.com/Jacob-C-Smith/Machines/actions/workflows/make.yml)
+
+## Overview
+
 * Author: Jon Flores, Jacob Smith
 * Class: CS361 002
 * Semester: Fall 2024
-
-## Overview
 
 [TODO]
 
