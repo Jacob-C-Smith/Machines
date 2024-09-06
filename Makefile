@@ -9,11 +9,11 @@ JFLAGS= -cp .:lib/*
 .java.class:
 	javac $(JFLAGS) $<
 
-all: dfa_test # nfa_test  
+all: dfa_test example # nfa_test  
 
 dfa_test: test/dfa/DFATest.class
 
-# nfa_test: 
+example: main.class
 
 test: test/java/AppTest.java
 

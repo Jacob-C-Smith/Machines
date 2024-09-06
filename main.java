@@ -10,24 +10,20 @@ public class main {
      * 
      * @return 1 on success, 0 on error
      */
+    /* 
     private static int parse_command_line_arguments ( String[] args )
     {
 
         // Success
         return 1;
-    }
+    }*/
 
     
     // Entry point
     public static void main(String[] args) {
+       
+        System.out.printf("Hello, World!\n");
         
-        // Initialized data
-        DFA dfa = new DFA();
-
-        
-        dfa.addSigma('0');
-        dfa.addSigma('1');
-
         // Success
         System.exit(0);
     }
