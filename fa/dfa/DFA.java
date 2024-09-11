@@ -57,7 +57,7 @@ public class DFA implements DFAInterface {
         if ( ret )
                 
             // ... add it to the state collection
-            states.put(name, null);
+            states.put(name, new DFAState(name));
         
         // Done
         return ret;
