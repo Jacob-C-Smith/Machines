@@ -180,4 +180,61 @@ public class DFA implements DFAInterface {
         throw new UnsupportedOperationException("Unimplemented method 'swap'");
     }
     
+    @Override
+    public String toString()
+    {
+        
+        // Initialized data
+        String q = "";
+        String sig = "";
+        String delta = "  ";
+
+        // Build Q
+        for (String state : states.keySet()) 
+            q = q + state + " ";
+        
+        // Build sigma
+        for (char c : sigma) 
+            sig = sig + Character.toString(c) + " ";
+    
+        // Build delta
+        for ( char c : transition.keySet() )
+            delta += Character.toString(c) + " ";
+        
+        // Append a line feed
+        delta += "\n";
+
+        for (String fromState : states.keySet()) {
+
+            // Initialized data
+            String c = states.get(fromState).getName();
+
+            
+            // Prefix
+            delta += fromState + " ";
+
+            for ( char z : transition.keySet() )
+            {
+                delta += transition.get(z).get(fromState) + " ";
+            }
+
+            // Suffix
+            delta += "\n";
+        }
+
+        return String.format(
+            "Q = { %s}\n" +
+            "Sigma = { %s}\n" +
+            "delta = \n" + 
+            "%s\n" +
+            "q0 = %s\n" +
+            "F = { %s }\n",
+            q,
+            sig,
+            delta,
+            initialState.getName(),
+            "[TODO]"
+        );
+    }
+	
 }
