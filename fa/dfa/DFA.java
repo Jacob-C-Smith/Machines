@@ -187,7 +187,8 @@ public class DFA implements DFAInterface {
         // Initialized data
         String q = "";
         String sig = "";
-        String delta = "  ";
+        String delta = "";
+        String f = "";
 
         // Build Q
         for (String state : states.keySet()) 
@@ -199,7 +200,7 @@ public class DFA implements DFAInterface {
     
         // Build delta
         for ( char c : transition.keySet() )
-            delta += Character.toString(c) + " ";
+            delta += Character.toString(c) + "\t";
         
         // Append a line feed
         delta += "\n";
@@ -211,29 +212,34 @@ public class DFA implements DFAInterface {
 
             
             // Prefix
-            delta += fromState + " ";
+            delta += fromState + "\t";
 
             for ( char z : transition.keySet() )
             {
-                delta += transition.get(z).get(fromState) + " ";
+                delta += transition.get(z).get(fromState) + "\t";
             }
 
             // Suffix
             delta += "\n";
         }
 
+
+        // Build F
+        for (State state : finalStates) 
+            f = f + state.getName() + " ";
+        
         return String.format(
             "Q = { %s}\n" +
             "Sigma = { %s}\n" +
             "delta = \n" + 
-            "%s\n" +
+            "\t%s" +
             "q0 = %s\n" +
-            "F = { %s }\n",
+            "F = { %s}\n",
             q,
             sig,
             delta,
             initialState.getName(),
-            "[TODO]"
+            f
         );
     }
 	
