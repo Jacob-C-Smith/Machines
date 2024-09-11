@@ -20,10 +20,35 @@ public class main {
 
     
     // Entry point
-    public static void main(String[] args) {
+    public static void main (String[] args) {
        
-        System.out.printf("Hello, World!\n");
+        // Initialized data
+        DFA dfa = new DFA();
+
+        // Add characters
+        dfa.addSigma('0');
+        dfa.addSigma('1');
         
+        // Add states
+        dfa.addState("a");
+        dfa.addState("b");
+
+        // Add transitions
+        dfa.addTransition("a", "a", '0');
+        dfa.addTransition("a", "b", '1');
+        dfa.addTransition("b", "a", '0');
+        dfa.addTransition("b", "b", '1');
+
+        // Add initial state
+        dfa.setStart("a");
+        dfa.setFinal("b");
+
+        // Print the DFA
+        System.out.printf("%s\n", dfa.toString());
+
+        // Test strings
+        //dfa.accepts("ab");
+
         // Success
         System.exit(0);
     }
