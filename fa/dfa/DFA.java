@@ -187,7 +187,8 @@ public class DFA implements DFAInterface {
         // Initialized data
         String q = "";
         String sig = "";
-        String delta = "  ";
+        String delta = "";
+        String f = "";
 
         // Build Q
         for (String state : states.keySet()) 
@@ -198,43 +199,54 @@ public class DFA implements DFAInterface {
             sig = sig + Character.toString(c) + " ";
     
         // Build delta
-        for ( char c : transition.keySet() )
-            delta += Character.toString(c) + " ";
-        
-        // Append a line feed
-        delta += "\n";
+        {
 
-        for (String fromState : states.keySet()) {
-
-            // Initialized data
-            String c = states.get(fromState).getName();
-
+            // Build the column headers
+            for ( char c : transition.keySet() )
+                delta += Character.toString(c) + "\t";
             
-            // Prefix
-            delta += fromState + " ";
+            // Append a new line
+            delta += "\n";
 
-            for ( char z : transition.keySet() )
+            // Build each row in the state transition matrix
+            for (String fromState : states.keySet())
             {
-                delta += transition.get(z).get(fromState) + " ";
+
+                // Prefix
+                delta += fromState + "\t";
+
+                // Iterate through each transition character
+                for ( char z : transition.keySet() )
+
+                    // Get the transitions on character 'z' ...
+                    delta += transition.get(z)
+
+                    // ... then add the to state to the row
+                    .get(fromState) + "\t";
+
+                // Suffix
+                delta += "\n";
             }
 
-            // Suffix
-            delta += "\n";
         }
 
+        // Build F
+        for (State state : finalStates) 
+            f = f + state.getName() + " ";
+        
+        // Done
         return String.format(
             "Q = { %s}\n" +
             "Sigma = { %s}\n" +
             "delta = \n" + 
-            "%s\n" +
+            "\t%s" +
             "q0 = %s\n" +
-            "F = { %s }\n",
+            "F = { %s}\n",
             q,
             sig,
             delta,
             initialState.getName(),
-            "[TODO]"
+            f
         );
     }
-	
 }
