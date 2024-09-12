@@ -138,7 +138,7 @@ public class DFA implements DFAInterface {
     public boolean isFinal(String name) {
             
         // Initialized data
-        boolean ret = finalStates.contains(name);
+        boolean ret = finalStates.contains(getState(name));
         
         // Done
         return ret;    
