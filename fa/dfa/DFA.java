@@ -154,9 +154,14 @@ public class DFA implements DFAInterface {
     @Override
     public boolean addTransition(String fromState, String toState, char onSymb) {
         
-        // TODO: Check fromState
-        // TODO: Check toState
-        // TODO: Check onSymb
+        // Check onSymb
+        if ( sigma.contains(onSymb) == false ) return false;
+
+        // Check toState
+        if ( states.keySet().contains(toState) == false ) return false;
+        
+        // Check fromState
+        if ( states.keySet().contains(fromState) == false ) return false;
 
         // Initialized data
         HashMap<String, String> transitions = null;
@@ -171,7 +176,7 @@ public class DFA implements DFAInterface {
         this.transition.get(onSymb).put(fromState, toState);;
 
         // Done
-        return false;
+        return true;
     }
 
     @Override
