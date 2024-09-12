@@ -44,10 +44,11 @@ public class main {
         dfa.setFinal("b");
 
         // Print the DFA
-        System.out.printf("%s\n", dfa.toString());
+        System.out.printf(dfa.toString());
+        
+        DFA dfa2 = dfa.swap('0', '1');
 
-        // Test strings
-        //dfa.accepts("ab");
+        System.out.printf(dfa2.toString());
 
         // Success
         System.exit(0);

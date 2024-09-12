@@ -15,12 +15,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.io.Serializable;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 // Machines
 import fa.State;
 
 // Classes
-public class DFA implements DFAInterface {
+public class DFA implements DFAInterface, Serializable {
 
     // Private fields
     private Set<Character> sigma = null;
@@ -198,9 +205,6 @@ public class DFA implements DFAInterface {
         // Check fromState
         if ( states.keySet().contains(fromState) == false ) return false;
 
-        // Initialized data
-        HashMap<String, String> transitions = null;
-
         // Check if the set contains the transition character
         if ( this.transition.containsKey(onSymb) == false )
         
@@ -216,8 +220,29 @@ public class DFA implements DFAInterface {
 
     @Override
     public DFA swap(char symb1, char symb2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'swap'");
+
+        DFA ret = new DFA();
+
+		try {
+            File f = new File("dfa.serialized");
+			FileOutputStream fileOut = new FileOutputStream(f); // File.createTempFile("1234", "5678")
+            FileInputStream fileIn = null;
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            ObjectInputStream in = null;
+
+			out.writeObject(this);
+			out.close();
+
+            fileIn = new FileInputStream(f);
+            in = new ObjectInputStream(fileIn);
+
+            ret = (DFA) in.readObject();
+            
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+        return ret;
     }
     
     @Override
