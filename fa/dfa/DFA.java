@@ -239,42 +239,30 @@ public class DFA implements DFAInterface {
             sig = sig + Character.toString(c) + " ";
     
         // Build delta
-        {
+        for ( char c : transition.keySet() )
+            delta += Character.toString(c) + " ";
+        
+        // Append a line feed
+        delta += "\n";
 
-            // Build the column headers
-            for ( char c : transition.keySet() )
-                delta += Character.toString(c) + "\t";
+        for (String fromState : states.keySet()) {
+
+            // Initialized data
+            String c = states.get(fromState).getName();
+
             
-            // Append a new line
-            delta += "\n";
+            // Prefix
+            delta += fromState + " ";
 
-            // Build each row in the state transition matrix
-            for (String fromState : states.keySet())
+            for ( char z : transition.keySet() )
             {
-
-                // Prefix
-                delta += fromState + "\t";
-
-                // Iterate through each transition character
-                for ( char z : transition.keySet() )
-
-                    // Get the transitions on character 'z' ...
-                    delta += transition.get(z)
-
-                    // ... then add the to state to the row
-                    .get(fromState) + "\t";
-
-                // Suffix
-                delta += "\n";
+                delta += transition.get(z).get(fromState) + " ";
             }
 
+            // Suffix
+            delta += "\n";
         }
 
-        // Build F
-        for (State state : finalStates) 
-            f = f + state.getName() + " ";
-        
-        // Done
         return String.format(
             "Q = { %s}\n" +
             "Sigma = { %s}\n" +
