@@ -27,6 +27,7 @@ public class DFA implements DFAInterface {
     private Map<String, State> states = null;
     private State initialState = null;
     private Set<State> finalStates = null;
+    private State currentState = null;
     private HashMap<Character, HashMap<String,String>> transition = null;
     
     public DFA ( )
@@ -105,10 +106,44 @@ public class DFA implements DFAInterface {
         return;
     }
 
+    private boolean acceptsRecursive ( String s )
+    {
+        // Base case
+        if ( s.length() == 0 )
+        {
+    
+            // Accept 
+            return finalStates.contains(currentState) ;
+        }
+
+        // Initialized data
+        char c = s.charAt(0);
+        HashMap<String, String> tr = null;
+
+        // Error check
+        if ( sigma.contains(c) == false ) return false; 
+
+        // Store the transition lookup for character c
+        tr = transition.get(c);
+
+        currentState = getState(
+            tr.get(
+                currentState.getName()
+            )
+        );
+        
+        // Do it again
+        return acceptsRecursive(s.substring(1));
+    }
+
     @Override
     public boolean accepts(String s) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'accepts'");
+        
+        // Set the current state
+        currentState = initialState;
+
+        // Done
+        return acceptsRecursive(s);
     }
 
     @Override
