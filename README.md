@@ -8,7 +8,7 @@
 * Class: CS361 002
 * Semester: Fall 2024
 
-[TODO]
+DFA program. Takes in a series of nodes as a string and allows for the setting of transitions between given nodes and creates a map. Functionality also allows for swapping of transitions between one another for any node. 
 
 ## Reflection
 ### Jon:
