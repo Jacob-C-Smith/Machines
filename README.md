@@ -11,8 +11,10 @@
 [TODO]
 
 ## Reflection
+### Jon:
+I enjoyed this project and working with Jacob. To avoid merge conflicts, we decided to only work from one machine (Jacob's) and to only work on the project when we could meet in person. As such, all the pushes are from his machine on the github repo associated with this project. That being said, we wroked really well together in bouncing ideas and understandings back and forth between eachother. We both made sure that the other was understanding both the concepts and the code as we progressed.
 
-[TODO]
+[TODO: Jacob]
 
 ## Download
  To download dict, execute the following command
