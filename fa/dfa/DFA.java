@@ -36,7 +36,7 @@ public class DFA implements DFAInterface, Serializable {
     private Set<State> finalStates = null;
     private State currentState = null;
     private HashMap<Character, HashMap<String,String>> transition = null;
-    
+
     public DFA ( )
     {
 
@@ -237,6 +237,17 @@ public class DFA implements DFAInterface, Serializable {
             in = new ObjectInputStream(fileIn);
 
             ret = (DFA) in.readObject();
+
+            in.close();
+
+            HashMap<String,String> t1 = ret.transition.get(symb1);
+            HashMap<String,String> t2 = ret.transition.get(symb2);
+            ret.transition.put(symb2, ret.transition.put(symb1, t2));
+
+            System.out.println(toString());
+            System.out.println(ret.toString());
+
+
             
 		} catch (Exception e) {
 			System.out.println(e);
@@ -265,7 +276,7 @@ public class DFA implements DFAInterface, Serializable {
     
         // Build delta
         for ( char c : transition.keySet() )
-            delta += Character.toString(c) + " ";
+            delta += Character.toString(c) + "\t";
         
         // Append a line feed
         delta += "\n";
@@ -277,17 +288,21 @@ public class DFA implements DFAInterface, Serializable {
 
             
             // Prefix
-            delta += fromState + " ";
+            delta += fromState + "\t";
 
             for ( char z : transition.keySet() )
             {
-                delta += transition.get(z).get(fromState) + " ";
+                delta += transition.get(z).get(fromState) + "\t";
             }
 
             // Suffix
             delta += "\n";
         }
 
+        // Build F
+        for (State state : finalStates) 
+            f = f + state.getName() + " ";
+            
         return String.format(
             "Q = { %s}\n" +
             "Sigma = { %s}\n" +
