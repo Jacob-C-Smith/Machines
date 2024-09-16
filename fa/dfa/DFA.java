@@ -13,8 +13,10 @@ package fa.dfa;
 // Java standard library
 import java.util.Map;
 import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.io.Serializable;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,27 +32,27 @@ import fa.State;
 public class DFA implements DFAInterface, Serializable {
 
     // Private fields
-    private Set<Character> sigma = null;
-    private Map<String, State> states = null;
+    private HashSet<Character> sigma = null;
+    private LinkedHashMap<String, State> states = null;
     private State initialState = null;
-    private Set<State> finalStates = null;
+    private HashSet<State> finalStates = null;
     private State currentState = null;
-    private HashMap<Character, HashMap<String,String>> transition = null;
+    private LinkedHashMap<Character, LinkedHashMap<String,String>> transition = null;
 
     public DFA ( )
     {
 
         // Construct an alphabet
-        this.sigma = new HashSet<Character>();
+        this.sigma = new LinkedHashSet<Character>();
 
         // Construct a collection of states
-        this.states = new HashMap<String, State>();
+        this.states = new LinkedHashMap<String, State>();
 
         // Construct a collection of the final states
-        this.finalStates = new HashSet<State>();
+        this.finalStates = new LinkedHashSet<State>();
 
         // Construct a collection of transitions
-        this.transition = new HashMap<Character, HashMap<String,String>>();
+        this.transition = new LinkedHashMap<Character, LinkedHashMap<String,String>>();
 
         // Done
     }
@@ -125,7 +127,7 @@ public class DFA implements DFAInterface, Serializable {
 
         // Initialized data
         char c = s.charAt(0);
-        HashMap<String, String> tr = null;
+        LinkedHashMap<String, String> tr = null;
 
         // Error check
         if ( sigma.contains(c) == false ) return false; 
@@ -157,7 +159,7 @@ public class DFA implements DFAInterface, Serializable {
     public Set<Character> getSigma() {
         
         // Initialized data
-        HashSet<Character> ret = new HashSet<Character>();
+        LinkedHashSet<Character> ret = new LinkedHashSet<Character>();
 
         // Iterate through our set
         for (Character character : sigma) 
@@ -209,7 +211,7 @@ public class DFA implements DFAInterface, Serializable {
         if ( this.transition.containsKey(onSymb) == false )
         
             // Construct a transition lookup for the character
-            this.transition.put(onSymb, new HashMap<String, String>());
+            this.transition.put(onSymb, new LinkedHashMap<String, String>());
         
         // Store the transition lookup
         this.transition.get(onSymb).put(fromState, toState);;
@@ -240,15 +242,9 @@ public class DFA implements DFAInterface, Serializable {
 
             in.close();
 
-            HashMap<String,String> t1 = ret.transition.get(symb1);
-            HashMap<String,String> t2 = ret.transition.get(symb2);
+            LinkedHashMap<String,String> t2 = ret.transition.get(symb2);
             ret.transition.put(symb2, ret.transition.put(symb1, t2));
 
-            System.out.println(toString());
-            System.out.println(ret.toString());
-
-
-            
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -265,17 +261,21 @@ public class DFA implements DFAInterface, Serializable {
         String sig = "";
         String delta = "";
         String f = "";
+        ArrayList<Character> a = new ArrayList<Character>();
 
         // Build Q
         for (String state : states.keySet()) 
             q = q + state + " ";
         
         // Build sigma
-        for (char c : sigma) 
+        for (char c : sigma)
+        {
             sig = sig + Character.toString(c) + " ";
+            a.add(c);
+        }
     
         // Build delta
-        for ( char c : transition.keySet() )
+        for ( char c : a )
             delta += Character.toString(c) + "\t";
         
         // Append a line feed
@@ -283,16 +283,13 @@ public class DFA implements DFAInterface, Serializable {
 
         for (String fromState : states.keySet()) {
 
-            // Initialized data
-            String c = states.get(fromState).getName();
-
-            
+            // Initialized data  
             // Prefix
             delta += fromState + "\t";
 
-            for ( char z : transition.keySet() )
+            for ( int i = 0; i < a.size(); i++ )
             {
-                delta += transition.get(z).get(fromState) + "\t";
+                delta += transition.get(a.get(i)).get(fromState) + "\t";
             }
 
             // Suffix
