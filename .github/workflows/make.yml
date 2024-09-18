@@ -34,5 +34,5 @@ jobs:
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: |
-        java main
+        java -cp .:lib/junit-platform-console-standalone-1.9.2.jar org.junit.runner.JUnitCore test.dfa.DFATest
         
