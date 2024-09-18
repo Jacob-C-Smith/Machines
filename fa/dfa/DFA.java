@@ -223,32 +223,54 @@ public class DFA implements DFAInterface, Serializable {
     @Override
     public DFA swap(char symb1, char symb2) {
 
+        // Initialized data
         DFA ret = new DFA();
 
 		try {
+
+            // Initialized data
             File f = new File("dfa.serialized");
-			FileOutputStream fileOut = new FileOutputStream(f); // File.createTempFile("1234", "5678")
+			FileOutputStream fileOut = new FileOutputStream(f);
             FileInputStream fileIn = null;
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
             ObjectInputStream in = null;
+            LinkedHashMap<String,String> t2 = null;
 
+            // Write ourselves to the object output buffer
 			out.writeObject(this);
+
+            // Release resources
 			out.close();
 
+            // Construct a FileInputStream to read the file
             fileIn = new FileInputStream(f);
+
+            // Construct an object input stream to read the DFA
             in = new ObjectInputStream(fileIn);
 
+            // Construct the DFA from the stream
             ret = (DFA) in.readObject();
 
+            // Release resources
             in.close();
 
-            LinkedHashMap<String,String> t2 = ret.transition.get(symb2);
+            // Store the transition
+            t2 = ret.transition.get(symb2);
+
+            // Swap the transitions on the copy
             ret.transition.put(symb2, ret.transition.put(symb1, t2));
 
-		} catch (Exception e) {
-			System.out.println(e);
+		}
+        
+        // Error handling
+        catch (Exception e)
+        {
+
+            // Write errors to standard error
+			System.err.println(e);
 		}
 
+        // Done
         return ret;
     }
     
