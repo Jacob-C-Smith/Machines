@@ -13,7 +13,7 @@ all: dfa_test example # nfa_test
 
 dfa_test: test/dfa/DFATest.class
 
-example: main.class
+example: main.class Colorful.class
 
 test: test/java/AppTest.java
 
