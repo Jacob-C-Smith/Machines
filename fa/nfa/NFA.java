@@ -1,8 +1,8 @@
 /** !
  * Nondeterministic Finite Automata implementation
- * 
+ *
  * @file fa/nfa/NFA.java
- * 
+ *
  * @author Jon Flores
  * @author Jacob Smith
  */
@@ -10,12 +10,8 @@
 // Package
 package fa.nfa;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.*;
 // Java standard library
-import java.util.Set;
 
 // Machines
 import fa.State;
@@ -26,10 +22,10 @@ public class NFA implements NFAInterface {
 
     // Private fields
     private HashSet<Character> sigma = null;
-    private LinkedHashMap<String, State> states = null;
-    private State initialState = null;
-    private HashSet<State> finalStates = null;
-    private State currentState = null;
+    private LinkedHashMap<String, NFAState> states = null;
+    private NFAState initialState = null;
+    private HashSet<NFAState> finalStates = null;
+    private NFAState currentState = null;
     private LinkedHashMap<Character, LinkedHashMap<String, HashSet<String>>> transition = null;
 
     public NFA ( )
@@ -39,10 +35,10 @@ public class NFA implements NFAInterface {
         this.sigma = new LinkedHashSet<Character>();
 
         // Construct a collection of states
-        this.states = new LinkedHashMap<String, State>();
+        this.states = new LinkedHashMap<String, NFAState>();
 
         // Construct a collection of the final states
-        this.finalStates = new LinkedHashSet<State>();
+        this.finalStates = new LinkedHashSet<NFAState>();
 
         // Construct a collection of transitions
         this.transition = new LinkedHashMap<Character, LinkedHashMap<String, HashSet<String>>>();
@@ -58,22 +54,22 @@ public class NFA implements NFAInterface {
 
         // Initialized data
         boolean ret = ( states.get(name) == null );
-        
+
         // If the state isn't there ...
         if ( ret )
-                
+
             // ... add it to the state collection
-            states.put(name, new DFAState(name));
-        
+            states.put(name, new NFAState(name));
+
         // Done
         return ret;
     }
 
     @Override
     public boolean setFinal(String name) {
-        
+
         // Initialized data
-        State state = states.get(name);
+        NFAState state = states.get(name);
 
         // Error checking
         if ( state == null ) return false;
@@ -87,9 +83,9 @@ public class NFA implements NFAInterface {
 
     @Override
     public boolean setStart(String name) {
-        
+
         // Initialized data
-        State state = states.get(name);
+        NFAState state = states.get(name);
 
         // Error checking
         if ( state == null ) return false;
@@ -119,40 +115,40 @@ public class NFA implements NFAInterface {
 
     @Override
     public Set<Character> getSigma() {
-        
+
         // Initialized data
         LinkedHashSet<Character> ret = new LinkedHashSet<Character>();
 
         // Iterate through our set
-        for (Character character : sigma) 
+        for (Character character : sigma)
 
             // Add the character to the (copy of the) alphabet
             ret.add(character);
-        
+
         // Done
         return ret;
     }
 
     @Override
-    public State getState(String name) {
-        
+    public NFAState getState(String name) {
+
         // Done
         return states.get(name);
     }
 
     @Override
     public boolean isFinal(String name) {
-            
+
         // Initialized data
         boolean ret = finalStates.contains(getState(name));
-        
+
         // Done
         return ret;
     }
 
     @Override
     public boolean isStart(String name) {
-        
+
         // Done
         return ( initialState.getName().equals(name) );
     }
@@ -165,9 +161,15 @@ public class NFA implements NFAInterface {
 
     @Override
     public Set<NFAState> eClosure(NFAState s) {
-        
-        HashSet<String> ret = null;
 
+        Set<NFAState> ret = null;
+        ret.add(states.get(s));
+        for(Character symbol : transition.keySet()){
+            if(symbol.equals('e')) {
+                eClosure(states.get(transition.get(symbol).get('e')));
+                ret.add(states.get(transition.get(symbol).get('e')));
+            }
+        }
         return ret;
     }
 
@@ -179,7 +181,7 @@ public class NFA implements NFAInterface {
 
     @Override
     public boolean addTransition(String fromState, Set<String> toStates, char onSymb) {
-        
+
         // Initialized data
         HashSet<String> _toStates = new HashSet<String>();
 
@@ -190,26 +192,26 @@ public class NFA implements NFAInterface {
         for (String state : states.keySet())
             if ( states.keySet().contains(state) == false )
                 return false;
-    
+
         // Check fromState
         if ( states.keySet().contains(fromState) == false ) return false;
-        
+
         // Check if the set contains the transition character
         if ( this.transition.containsKey(onSymb) == false )
-            
+
             // Construct a transition lookup for the character
             this.transition.put(onSymb, new LinkedHashMap<String, HashSet<String>>());
 
         // For each to state ...
-        for ( String state : toStates ) 
-        
+        for ( String state : toStates )
+
             // ... build the lookup
             _toStates.add(state);
 
         // ... store the transition lookup
         this.transition.get(onSymb).put(fromState, _toStates);
 
-        // Done 
+        // Done
         return true;
     }
 
@@ -229,26 +231,26 @@ public class NFA implements NFAInterface {
         ArrayList<Character> a = new ArrayList<Character>();
 
         // Build Q
-        for (String state : states.keySet()) 
+        for (String state : states.keySet())
             q = q + state + " ";
-        
+
         // Build sigma
         for (char c : sigma)
         {
             sig = sig + Character.toString(c) + " ";
             a.add(c);
         }
-    
+
         // Build delta
         for ( char c : a )
             delta += Character.toString(c) + "\t";
-        
+
         // Append a line feed
         delta += "\n";
 
         for (String fromState : states.keySet()) {
 
-            // Initialized data  
+            // Initialized data
             // Prefix
             delta += fromState + "\t";
 
@@ -263,13 +265,13 @@ public class NFA implements NFAInterface {
         }
 
         // Build F
-        for (State state : finalStates) 
+        for (NFAState state : finalStates)
             f = f + state.getName() + " ";
-            
+
         return String.format(
             "Q = { %s}\n" +
             "Sigma = { %s}\n" +
-            "delta = \n" + 
+            "delta = \n" +
             "\t%s" +
             "q0 = %s\n" +
             "F = { %s}\n",
@@ -280,5 +282,5 @@ public class NFA implements NFAInterface {
             f
         );
     }
-    
+
 }

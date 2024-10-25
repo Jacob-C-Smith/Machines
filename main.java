@@ -1,4 +1,4 @@
-// Import 
+// Import
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,9 +12,9 @@ public class main {
 
     /** !
      * DFA example
-     * 
+     *
      * @param void
-     * 
+     *
      * @return void
      */
     public static void dfa_main ( )
@@ -23,7 +23,7 @@ public class main {
         // Initialized data
         DFA dfa = new DFA();
         String strings[] =
-        { 
+        {
             "0",
             "1",
             "00",
@@ -76,18 +76,18 @@ public class main {
         Colorful.printf(" - Results - \n", Colorful.Color.LIGHT_CYAN);
 
         // Test some strings
-        for (String string : strings) 
+        for (String string : strings)
         {
-            
+
             // Initialized data
             Boolean accepts = dfa.accepts(string);
 
-            System.out.printf(" %-3s --> ", string);  
+            System.out.printf(" %-3s --> ", string);
 
-            // Print the results to standard out            
+            // Print the results to standard out
             if   ( accepts ) Colorful.printf("Accepts\n", Colorful.Color.LIGHT_GREEN);
             else             Colorful.printf("Rejects\n", Colorful.Color.RED);
-            
+
         }
 
         // Done
@@ -96,19 +96,19 @@ public class main {
 
     /** !
      * NFA example
-     * 
+     *
      * @param void
-     * 
+     *
      * @return void
      */
     public static void nfa_main ( )
     {
-        
+
         // Initialized data
         NFA nfa = new NFA();
         Set<NFAState> q0EpsilonClosure = null;
         String strings[] =
-        { 
+        {
             "0",
             "1",
             "00",
@@ -124,20 +124,20 @@ public class main {
             "110",
             "111"
         };
-		
+
         // Construct the alphabet
 		nfa.addSigma('0');
 		nfa.addSigma('1');
-		
+
         // Add states
 		nfa.addState("a");
 		nfa.addState("b");
 		nfa.addState("c");
 		nfa.addState("d");
-		
+
         // Set the initial state(s)
 		nfa.setStart("a");
-		
+
 	    // Add the transitions between states
         // nfa.addTransition("a", Set.of("a"), '0');
         nfa.addTransition("a", Set.of("b"), 'e');
@@ -149,7 +149,7 @@ public class main {
         q0EpsilonClosure = nfa.eClosure(new NFAState("a"));
 
         // Print states that can be reached from q0
-        for ( String string : q0EpsilonClosure )
+        for ( NFAState state : q0EpsilonClosure )
             System.out.printf("%s, ");
 
         System.out.printf("\n");
@@ -164,18 +164,18 @@ public class main {
         Colorful.printf(" - Results - \n", Colorful.Color.LIGHT_CYAN);
 
         // Test some strings
-        for (String string : strings) 
+        for (String string : strings)
         {
-            
+
             // Initialized data
             Boolean accepts = nfa.accepts(string);
 
-            System.out.printf(" %-3s --> ", string);  
+            System.out.printf(" %-3s --> ", string);
 
-            // Print the results to standard out            
+            // Print the results to standard out
             if   ( accepts ) Colorful.printf("Accepts\n", Colorful.Color.LIGHT_GREEN);
             else             Colorful.printf("Rejects\n", Colorful.Color.RED);
-            
+
         }
 
         // Done
@@ -184,16 +184,16 @@ public class main {
 
     // Entry point
     public static void main (String[] args) {
-       
+
         // Parse command line arguments
-        for (String string : args) 
+        for (String string : args)
 
             // DFA example
             if ( string.equals("dfa") ) dfa_main();
-            
+
             // NFA example
             else if ( string.equals("nfa") ) nfa_main();
-        
+
         // Success
         System.exit(0);
     }
