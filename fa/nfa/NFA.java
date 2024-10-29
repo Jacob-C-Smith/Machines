@@ -12,6 +12,7 @@ package fa.nfa;
 
 import java.util.*;
 // Java standard library
+import java.util.Map.Entry;
 
 // Machines
 import fa.State;
@@ -162,14 +163,51 @@ public class NFA implements NFAInterface {
     @Override
     public Set<NFAState> eClosure(NFAState s) {
 
-        Set<NFAState> ret = null;
-        ret.add(states.get(s));
-        for(Character symbol : transition.keySet()){
-            if(symbol.equals('e')) {
-                eClosure(states.get(transition.get(symbol).get('e')));
-                ret.add(states.get(transition.get(symbol).get('e')));
+        // Argument check
+        if ( transition.isEmpty() ) return new HashSet<NFAState>();
+        
+        // Initialized data
+        Set<NFAState> ret = new HashSet<NFAState>();
+        Set<String> ret_prime = new HashSet<String>();
+
+        // Store the parameter in the return
+        // !!! NOT ALWAYS !!!Set
+        // only self loops
+        //ret.add(states.get(s));
+
+        SequencedSet<Entry<Character, LinkedHashMap<String, HashSet<String>>>> transitions_for_iter = transition.sequencedEntrySet();
+
+        // Iterate through each transition
+        for(Entry<Character, LinkedHashMap<String, HashSet<String>>> t : transitions_for_iter){
+
+            // Fast exit
+            if ( t.getKey().toString().equals("e") == false ) continue;
+
+            //System.out.printf("%s --> ", t.getKey());
+            //System.out.printf("%s\n", t.getValue());
+            //System.out.printf("\n\n\n=== %s ===\n=== %s ===\n=== %s ===\n", t.getKey(), t.getValue().keySet(), s.getName());
+
+            if ( t.getValue().keySet().contains(s.getName()) == false ){
+                continue;
+            }
+
+            for(String u : t.getValue().get(s.getName())){
+                ret_prime.add(u);
             }
         }
+        //System.out.printf("\nFOUND %d TRANSITIONS FROM %s --> %s\n", ret_prime.size(), s.getName(), ret_prime.toString());
+
+        for (String t : ret_prime) {
+            ret.add(new NFAState(t));
+        }
+
+        for (NFAState state : ret) {
+            Set<NFAState> nfastateset = this.eClosure(state);
+            for (NFAState state2 : nfastateset) {
+                ret.add(state2);
+            }
+        }
+
         return ret;
     }
 
@@ -188,13 +226,13 @@ public class NFA implements NFAInterface {
         // Check onSymb
         if ( sigma.contains(onSymb) == false ) return false;
 
+        // Check fromState
+        if ( states.keySet().contains(fromState) == false ) return false;
+
         // Check toStates
         for (String state : states.keySet())
             if ( states.keySet().contains(state) == false )
                 return false;
-
-        // Check fromState
-        if ( states.keySet().contains(fromState) == false ) return false;
 
         // Check if the set contains the transition character
         if ( this.transition.containsKey(onSymb) == false )
@@ -208,6 +246,17 @@ public class NFA implements NFAInterface {
             // ... build the lookup
             _toStates.add(state);
 
+        System.out.printf("%s\n", this.transition.get(onSymb).get(fromState));
+
+        if ( this.transition.get(onSymb).get(fromState) != null )
+        {
+
+            for ( String state : this.transition.get(onSymb).get(fromState) ) 
+            
+                // ... build the lookup
+                _toStates.add(state);
+        }
+                
         // ... store the transition lookup
         this.transition.get(onSymb).put(fromState, _toStates);
 
