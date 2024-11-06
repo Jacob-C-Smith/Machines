@@ -10,16 +10,23 @@
 // Package
 package fa.nfa;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 // Java standard library
 import java.util.Map.Entry;
 
 // Machines
 import fa.State;
+import fa.dfa.DFA;
 import fa.dfa.DFAState;
 
 // Classes
-public class NFA implements NFAInterface {
+public class NFA implements NFAInterface, Serializable {
 
     // Private fields
     private HashSet<Character> sigma = null;
@@ -28,6 +35,7 @@ public class NFA implements NFAInterface {
     private HashSet<NFAState> finalStates = null;
     private NFAState currentState = null;
     private LinkedHashMap<Character, LinkedHashMap<String, HashSet<String>>> transition = null;
+    private static int copies = 0;
 
     public NFA ( )
     {
@@ -108,10 +116,118 @@ public class NFA implements NFAInterface {
         return;
     }
 
+    public boolean accepts_r(String s)
+    {
+
+        // Initialized data
+        char currentSymbol = '\0';
+        Set<NFAState> nextStates = null;
+        boolean ret = false;
+
+        // Base case
+        if ( s.length() == 0 )
+        {
+
+            // Compute the set of states we can reach by e-closure
+            nextStates = eClosure(currentState);
+
+            // Iterate through each state
+            for (NFAState maybeEndState : nextStates) 
+                for (NFAState definitelyEndState : finalStates) 
+                    ret |= definitelyEndState.getName().equals(maybeEndState.getName());
+
+            // Success
+            return ret;
+        }
+
+        // Store the current symbol
+        currentSymbol = s.charAt(0);
+
+        // Compute the set of next states
+        nextStates = getToState(currentState, currentSymbol);
+
+        // Foreach state ...
+        for (NFAState nextState : nextStates)
+        {
+    
+            // Initialized data
+            NFA nfa_i = this.clone();
+            int before_copies = copies;
+
+            // Update the current state of the NFA
+            nfa_i.currentState = nextState;
+
+            // Accumulate results
+            ret |= nfa_i.accepts_r( (s.length() == 1) ? "" : s.substring(1) );
+
+        }
+
+        // Got one
+        if ( ret == true ) return true;
+        
+        // Success
+        return accepts_r( (s.length() == 1) ? "" : s.substring(1) );
+    }
+
     @Override
     public boolean accepts(String s) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'accepts'");
+
+        // Argument check
+        if ( s.length() == 0 ) 
+            return finalStates.contains(initialState);
+        
+        currentState = initialState;
+        
+        // Success
+        return accepts_r(s);
+    }
+
+    @Override
+    public NFA clone ( ) {
+
+        // Initialized data
+        NFA ret = new NFA();
+
+        copies++;
+
+		try {
+
+            // Initialized data
+            File f = new File("nfa.serialized");
+			FileOutputStream fileOut = new FileOutputStream(f);
+            FileInputStream fileIn = null;
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            ObjectInputStream in = null;
+
+            // Write ourselves to the object output buffer
+			out.writeObject(this);
+
+            // Release resources
+			out.close();
+
+            // Construct a FileInputStream to read the file
+            fileIn = new FileInputStream(f);
+
+            // Construct an object input stream to read the DFA
+            in = new ObjectInputStream(fileIn);
+
+            // Construct the DFA from the stream
+            ret = (NFA) in.readObject();
+
+            // Release resources
+            in.close();
+		}
+        
+        // Error handling
+        catch (Exception e)
+        {
+
+            // Write errors to standard error
+			System.err.println(e);
+		}
+
+        // Done
+        return ret;
     }
 
     @Override
@@ -156,8 +272,41 @@ public class NFA implements NFAInterface {
 
     @Override
     public Set<NFAState> getToState(NFAState from, char onSymb) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getToState'");
+
+        
+        // Initialized data
+        Set<NFAState> ret = new HashSet<NFAState>();
+        Set<String> ret_prime = new HashSet<String>();
+
+        SequencedSet<Entry<Character, LinkedHashMap<String, HashSet<String>>>> transitions_for_iter = transition.sequencedEntrySet();
+
+        // Iterate through each transition
+        for(Entry<Character, LinkedHashMap<String, HashSet<String>>> t : transitions_for_iter){
+
+            // Fast exit
+            if ( t.getKey().toString().equals("" + onSymb) == false ) continue;
+
+            if ( t.getValue().keySet().contains(from.getName()) == false ){
+                continue;
+            }
+
+            for(String u : t.getValue().get(from.getName())){
+                ret_prime.add(u);
+            }
+        }
+
+        for (String t : ret_prime) {
+            ret.add(new NFAState(t));
+        }
+
+        for (NFAState state : ret) {
+            Set<NFAState> nfastateset = this.eClosure(state);
+            for (NFAState state2 : nfastateset) {
+                ret.add(state2);
+            }
+        }
+
+        return ret;
     }
 
     @Override
@@ -167,7 +316,7 @@ public class NFA implements NFAInterface {
         if ( transition.isEmpty() ) return new HashSet<NFAState>();
         
         // Initialized data
-        Set<NFAState> ret = new HashSet<NFAState>();
+        Set<NFAState> ret = new TreeSet<NFAState>();
         Set<String> ret_prime = new HashSet<String>();
 
         // Store the parameter in the return
@@ -208,13 +357,22 @@ public class NFA implements NFAInterface {
             }
         }
 
+        // Add state s
+        ret.add(s);
+
+        // Done
         return ret;
     }
 
     @Override
     public int maxCopies(String s) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'maxCopies'");
+        
+        copies = 0;
+
+        accepts(s);
+
+        // Success
+        return copies;
     }
 
     @Override
@@ -225,6 +383,11 @@ public class NFA implements NFAInterface {
 
         // Check onSymb
         if ( sigma.contains(onSymb) == false ) return false;
+        
+        // Check for existing transitions
+        if ( transition.get(onSymb) != null )
+            if ( transition.get(onSymb).keySet().contains(fromState) )
+                return false;
 
         // Check fromState
         if ( states.keySet().contains(fromState) == false ) return false;
@@ -266,12 +429,18 @@ public class NFA implements NFAInterface {
 
     @Override
     public boolean isDFA() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isDFA'");
+        
+        // TODO: Check if there are any e transitions
+        // TODO: Check if there are more than one transitions on the same symbol
+        //       for a given state
+        // TODO: Ensure that each state has N transitions, where N 
+        //       is the cardinality of the alphabet
+        return false;
     }
 
     @Override
     public String toString() {
+        
         // Initialized data
         String q = "";
         String sig = "";
@@ -331,5 +500,4 @@ public class NFA implements NFAInterface {
             f
         );
     }
-
 }
