@@ -36,6 +36,7 @@ public class NFA implements NFAInterface, Serializable {
     private NFAState currentState = null;
     private LinkedHashMap<Character, LinkedHashMap<String, HashSet<String>>> transition = null;
     private static int copies = 0;
+    private int stringResidual = 0;
 
     public NFA ( )
     {
@@ -116,6 +117,7 @@ public class NFA implements NFAInterface, Serializable {
         return;
     }
 
+    /*
     public boolean accepts_r(String s)
     {
 
@@ -152,14 +154,12 @@ public class NFA implements NFAInterface, Serializable {
     
             // Initialized data
             NFA nfa_i = this.clone();
-            int before_copies = copies;
 
             // Update the current state of the NFA
             nfa_i.currentState = nextState;
 
             // Accumulate results
             ret |= nfa_i.accepts_r( (s.length() == 1) ? "" : s.substring(1) );
-
         }
 
         // Got one
@@ -168,7 +168,70 @@ public class NFA implements NFAInterface, Serializable {
         // Success
         return accepts_r( (s.length() == 1) ? "" : s.substring(1) );
     }
+    */
 
+    public boolean accepts_r(String s) {
+
+        // Initialize BFS
+        Queue<NFA> queue = new LinkedList<>();
+    
+        // Get the e-closure of the initial state(s) for the cloned NFA
+        Set<NFAState> startStates = eClosure(currentState);  // e-closure of the start state
+        queue.add(this);  // Add the cloned NFA to the queue for BFS
+        
+        // Track visited states (for the initial states, we add them to visited)
+        Set<NFAState> visited = new TreeSet<>();
+        visited.addAll(startStates);
+    
+        // Process the input string character by character
+        for (int i = 0; i < s.length(); i++) {
+            char currentSymbol = s.charAt(i);
+            Set<NFAState> nextStates = new HashSet<>();
+    
+            // Process each NFA in the queue
+            int queueSize = queue.size();
+
+            for (int j = 0; j < queueSize; j++) {
+                NFA currentNFA = queue.poll();
+    
+                // For the current NFA, get all reachable states for the current symbol
+                Set<NFAState> reachableStates = currentNFA.getToState(currentNFA.currentState, currentSymbol);
+    
+                // Add the e-closure of all reachable states to the next states
+                for (NFAState reachable : reachableStates) {
+                    Set<NFAState> eClosureStates = currentNFA.eClosure(reachable);
+                    for (NFAState eState : eClosureStates) {
+                        if (!visited.contains(eState)) {
+                            visited.add(eState);
+                            nextStates.add(eState);  // Add state to be processed in the next iteration
+                        }
+                    }
+                }
+
+                // For each reachable state, update the cloned NFA's current state and enqueue it for the next level
+                for (NFAState state : nextStates) {
+                    NFA nfaClone2 = currentNFA.clone();  // Clone the NFA once for this state
+                    nfaClone2.currentState = state;  // Set the current state for the cloned NFA
+                    queue.add(nfaClone2);  // Add the cloned NFA to the queue for processing in next steps
+                }
+
+                queue.add(currentNFA);
+                
+            }
+        }
+        
+        // After processing all symbols, check if any of the states in the queue is a final state
+        for (NFA nfa : queue) {
+            Set<NFAState> nextStates = eClosure(nfa.currentState);
+            for (NFAState maybeEndState : nextStates) 
+                for (NFAState definitelyEndState : finalStates) 
+                    if (definitelyEndState.getName().equals(maybeEndState.getName())) 
+                        return true;  // Found a final state
+        }
+
+        return false;  // No final state found
+    }
+    
     @Override
     public boolean accepts(String s) {
 
@@ -176,7 +239,12 @@ public class NFA implements NFAInterface, Serializable {
         if ( s.length() == 0 ) 
             return finalStates.contains(initialState);
         
+        if ( s.length() == 1 && s.charAt(0) == 'e')
+            return finalStates.contains(initialState);
+
         currentState = initialState;
+
+        stringResidual = s.length();
         
         // Success
         return accepts_r(s);
@@ -187,8 +255,6 @@ public class NFA implements NFAInterface, Serializable {
 
         // Initialized data
         NFA ret = new NFA();
-
-        copies++;
 
 		try {
 
@@ -271,7 +337,7 @@ public class NFA implements NFAInterface, Serializable {
     }
 
     @Override
-    public Set<NFAState> getToState(NFAState from, char onSymb) {
+    public synchronized Set<NFAState> getToState(NFAState from, char onSymb) {
 
         
         // Initialized data
@@ -298,15 +364,21 @@ public class NFA implements NFAInterface, Serializable {
         for (String t : ret_prime) {
             ret.add(new NFAState(t));
         }
-
+        
+        Set<NFAState> retFINAL = new HashSet<NFAState>();
+        
+        for (NFAState state : ret) {
+            retFINAL.add(state);
+        }
+        
         for (NFAState state : ret) {
             Set<NFAState> nfastateset = this.eClosure(state);
             for (NFAState state2 : nfastateset) {
-                ret.add(state2);
+                retFINAL.add(state2);
             }
         }
-
-        return ret;
+        
+        return retFINAL;
     }
 
     @Override
@@ -366,13 +438,65 @@ public class NFA implements NFAInterface, Serializable {
 
     @Override
     public int maxCopies(String s) {
+        int ret = 0;
+        // Initialize BFS
+        Queue<NFA> queue = new LinkedList<>();
+    
+        currentState = initialState;
+
+        // Get the e-closure of the initial state(s) for the cloned NFA
+        Set<NFAState> startStates = eClosure(currentState);  // e-closure of the start state
+        ret += startStates.size();
+        queue.add(this);  // Add the cloned NFA to the queue for BFS
         
-        copies = 0;
+        // Track visited states (for the initial states, we add them to visited)
+        Set<NFAState> visited = new TreeSet<>();
+        visited.addAll(startStates);
+    
+        // Process the input string character by character
+        for (int i = 0; i < s.length(); i++) {
+            char currentSymbol = s.charAt(i);
+            Set<NFAState> nextStates = new TreeSet<>();
+    
+            // Process each NFA in the queue
+            int queueSize = queue.size();
 
-        accepts(s);
+            for (int j = 0; j < queueSize; j++) {
+                NFA currentNFA = queue.poll();
+    
+                // For the current NFA, get all reachable states for the current symbol
+                Set<NFAState> reachableStates = currentNFA.getToState(currentNFA.currentState, currentSymbol);
+                boolean skp= false;
+                // Add the e-closure of all reachable states to the next states
+                for (NFAState reachable : reachableStates) {
+                    Set<NFAState> eClosureStates = currentNFA.eClosure(reachable);
+                    for (NFAState eState : eClosureStates) {
+                        if (!visited.contains(eState)) {
+                            visited.add(eState);
+                            if ( skp == false )
+                            {
+                                if ( reachableStates.isEmpty() );
+                                    ret += reachableStates.size() - 1;
+                                skp = true;
+                            }
+                            nextStates.add(eState);  // Add state to be processed in the next iteration
+                        }
+                    }
+                }
 
-        // Success
-        return copies;
+                // For each reachable state, update the cloned NFA's current state and enqueue it for the next level
+                for (NFAState state : nextStates) {
+                    NFA nfaClone2 = currentNFA.clone();  // Clone the NFA once for this state
+                    nfaClone2.currentState = state;  // Set the current state for the cloned NFA
+                    queue.add(nfaClone2);  // Add the cloned NFA to the queue for processing in next steps
+                }
+
+                queue.add(currentNFA);
+                
+            }
+        }
+        
+        return ret;  // No final state found
     }
 
     @Override
@@ -383,17 +507,12 @@ public class NFA implements NFAInterface, Serializable {
 
         // Check onSymb
         if ( sigma.contains(onSymb) == false ) return false;
-        
-        // Check for existing transitions
-        if ( transition.get(onSymb) != null )
-            if ( transition.get(onSymb).keySet().contains(fromState) )
-                return false;
 
         // Check fromState
         if ( states.keySet().contains(fromState) == false ) return false;
 
         // Check toStates
-        for (String state : states.keySet())
+        for (String state : toStates)
             if ( states.keySet().contains(state) == false )
                 return false;
 
@@ -409,7 +528,7 @@ public class NFA implements NFAInterface, Serializable {
             // ... build the lookup
             _toStates.add(state);
 
-        System.out.printf("%s\n", this.transition.get(onSymb).get(fromState));
+        //System.out.printf("%s\n", this.transition.get(onSymb).get(fromState));
 
         if ( this.transition.get(onSymb).get(fromState) != null )
         {
@@ -435,7 +554,31 @@ public class NFA implements NFAInterface, Serializable {
         //       for a given state
         // TODO: Ensure that each state has N transitions, where N 
         //       is the cardinality of the alphabet
-        return false;
+
+        // Initialized data
+        boolean ret = true;
+        ArrayList<Character> a = new ArrayList<Character>();
+
+        for (String fromState : states.keySet()) {
+
+            
+            for ( int i = 0; i < a.size(); i++ )
+            {
+                LinkedHashMap<String, HashSet<String>> var = transition.get(a.get(i));
+
+                if ( var == null ) 
+                    return false;
+
+                if ( var.size() > 1 )
+                    return false;
+
+                if ( eClosure(new NFAState(fromState)).size() != 1 )
+                    return false;
+            }
+        }
+
+
+        return ret;
     }
 
     @Override

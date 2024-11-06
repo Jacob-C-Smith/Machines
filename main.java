@@ -1,7 +1,4 @@
 // Import
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Set;
 
 import fa.dfa.DFA;
@@ -124,33 +121,27 @@ public class main {
             "110",
             "111"
         };
+        
 
         // Construct the alphabet
 		nfa.addSigma('0');
 		nfa.addSigma('1');
+		nfa.addSigma('e');
 
         // Add states
 		nfa.addState("a");
 		nfa.addState("b");
-		nfa.addState("c");
-		nfa.addState("d");
 
         // Set the initial state(s)
 		nfa.setStart("a");
 
+        // Set the final state
+        nfa.setFinal("b");
+        
 	    // Add the transitions between states
-        // nfa.addTransition("a", Set.of("a"), '0');
-        nfa.addTransition("a", Set.of("b"), 'e');
-        nfa.addTransition("b", Set.of("d"), 'e');
-		nfa.addTransition("c", Set.of("b"), 'e');
-		nfa.addTransition("a", Set.of("c"), '1');
-
-        // Compute epsilon closure on q0
-        q0EpsilonClosure = nfa.eClosure(new NFAState("a"));
-
-        // Print states that can be reached from q0
-        for ( NFAState state : q0EpsilonClosure )
-            System.out.printf("%s, ");
+		nfa.addTransition("a", Set.of("a"), '0');
+		nfa.addTransition("a", Set.of("b"), '1');
+		nfa.addTransition("b", Set.of("a"), 'e');
 
         System.out.printf("\n");
 
@@ -184,6 +175,9 @@ public class main {
 
     // Entry point
     public static void main (String[] args) {
+
+        // Argument check
+        if ( args.length == 0 ) System.out.printf("Usage: java main [dfa] [nfa]\n");
 
         // Parse command line arguments
         for (String string : args)

@@ -146,7 +146,7 @@ public class NFATest {
 		assertFalse(nfa.addTransition("q0", Set.of("q3"), '3'));
 		assertFalse(nfa.addTransition("q5", Set.of("q0","q2"), 'e'));
 
-
+		System.out.println(nfa.toString());
 
 		return nfa;
 
