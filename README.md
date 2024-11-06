@@ -12,7 +12,7 @@ NFA program. Takes in a series of nodes as a string and allows for the setting o
 
 ## Reflection
 ### Jon:
-
+We worked for a long while on this project, and I am willing to concede defeat on the few of the tests that we did not pass by submission time. That being said, I feel that with enough time, we could have been able to fully complete this project, and this is not a slight against the project timeline, but rather, a miscalculation on my part regarding my workload this semester. I am happy enough with the results given the circumstances of this time in the semester.
 
 ### Jacob:
 This project broke me. I need a break
