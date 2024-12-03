@@ -1,0 +1,32 @@
+=== LARGE ===
+ === a === 
+Average: 0.001101
+Median : 0.001062
+ === al ===  
+Average: 0.004300
+Median : 0.004113
+ === v === 
+Average: 0.004781
+Median : 0.004602
+ === s === 
+Average: 0.002692
+Median : 0.002677
+
+
+=== LARGER ===
+ === a === 
+Average: 0.006119
+Median : 0.006300
+
+ === al === 
+Average: 0.007769
+Median : 0.007397
+
+ === s === 
+Average: 0.009190
+Median : 0.008511
+
+ === v === 
+Average: 0.009189
+Median : 0.008358
+
