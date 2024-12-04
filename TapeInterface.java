@@ -56,22 +56,4 @@ public interface TapeInterface
      */
     @Override
     public String toString ( );
-
-    /**
-     * Dump the contents of the tape to standard out
-     * 
-     * @param void
-     * 
-     * @return int 
-     */
-    public void print ( );
-    
-    /**
-     * Dump the contents of the tape to a file
-     * 
-     * @param file the file to write to
-     * 
-     * @return int 
-     */
-    public void fprint ( File file );
 }

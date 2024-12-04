@@ -19,10 +19,9 @@
         },
         {
             "type": "java",
-            "name": "main",
+            "name": "TM",
             "request": "launch",
-            "mainClass": "main",
-            "projectName": "PR1_fa3aa615"
+            "mainClass": "main"
         }
     ]
 }
