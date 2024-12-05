@@ -47,6 +47,15 @@ public interface TapeInterface
      */
     public void right ( );
 
+    /** !
+     * Compute the sum of the tape
+     * 
+     * @param void
+     * 
+     * @return the sum of all symbols on the tape
+     */
+    public int sum ( );
+
     /**
      * Dump the contents of the tape
      * 
