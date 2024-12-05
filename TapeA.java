@@ -41,4 +41,40 @@ public class TapeA implements TapeInterface {
     {
         head++;
     }
+
+    @Override
+    public String toString ( )
+    {
+
+        String s = "";
+
+        for (int i = lim - 132; i != -1; i--) 
+        {
+            char nc = (char)(nl[i] + '0');
+            if (nc == '0') nc = '☐';
+            if ( head < 0 && i == -head - 1 )
+            {
+                String r = Colorful.format(String.valueOf(nc), Colorful.Color.RED);
+                s += r;
+            }
+            else
+                s += nc;
+        }
+        
+        for (int i = 0; i < lim; i++) 
+        {
+            char pc = (char)(pl[i] + '0');
+            if (pc == '0') pc = '☐';
+
+            if ( head >= 0 && i == head )
+            {
+                String r = Colorful.format(String.valueOf(pc), Colorful.Color.RED);
+                s += r;
+            }
+            else
+                s += (char)pc;
+        }
+
+        return s;
+    }
 }
