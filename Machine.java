@@ -120,13 +120,32 @@ public class Machine
 
         // Initialized data
         char onsymb = t.read();
-        
-        
+        char transition_tuple[] = transitions[(int)(onsymb)][current_state];
+
+        // Update the tape
+        t.write((char)(transition_tuple[INDEX_WRITE]));
+        if   (transition_tuple[INDEX_DIRECTION] == 'L') t.left();
+        else t.right();
+
+        // Update the state
+        current_state = transition_tuple[INDEX_TO];
+
+        // Test for halt
+        halt = (current_state == final_state);
+
+        // Increment steps
+        steps++;
     }
     
     @Override
     public String toString ( )
     {
         return "";
+    public boolean isHalted()
+    {
+
+        // Done
+        return halt;
+    }
     }
 }
