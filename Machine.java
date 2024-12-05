@@ -140,12 +140,31 @@ public class Machine
     @Override
     public String toString ( )
     {
-        return "";
+        return t.toString();
+    }
+
     public boolean isHalted()
     {
 
         // Done
         return halt;
     }
+
+    public void printTapeLF()
+    {
+
+        // Print the tape to standard out
+        System.out.printf("%s\n", t.toString());
+    }
+
+    public void printTapeCR()
+    {
+
+        // Print the tape to standard out
+        System.out.printf("%s\r", t.toString());
+    }
+
+    public int tapeSum() {
+        return t.sum();
     }
 }
