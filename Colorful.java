@@ -16,7 +16,7 @@ public class Colorful
     public static enum Color
     {
         BLACK(30),
-        RED(31),
+        RED(41),
         GREEN(32),
         YELLOW(33),
         BLUE(34),
@@ -79,7 +79,7 @@ public class Colorful
     public static final String format ( String format, Color c, Object...objects )
     {
         // Done
-        return String.format("\u001B[%dm" + format + "\u001B[0m", c.getColorCode(), objects);
+        return String.format("\u001B[%dm\u001B[1m" + format + "\u001B[0m", c.getColorCode(), objects);
     }
 
     // Entry point
