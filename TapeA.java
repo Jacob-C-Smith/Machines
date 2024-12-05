@@ -77,4 +77,21 @@ public class TapeA implements TapeInterface {
 
         return s;
     }
+
+    @Override
+    public int sum (  )
+    {
+
+        // Initialized data
+        int s = 0;
+
+        // Accumulate negaive list
+        for (char c : nl) s += c;
+
+        // Accumulate positive list
+        for (char c : pl) s += c;
+        
+        // Done
+        return s;
+    }
 }
