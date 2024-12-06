@@ -15,7 +15,7 @@ The step function performs reads before writes. Inside the tape read method, we 
 
 ## Reflection
 
-###Jon
+### Jon
 I was a little disappointed with how the last two projects went and felt that the combined efforts of Jacob and I amounted to more than what we turned in. As such, I dedicated a lot of time to putting in the thought with Jacob about the type of data structure we wanted to use. Luckily, I have a pretty strong statistics background, so when time came to test the ideas that Jacob and I settled on, we knew how approach a quantitative analysis. In the end, I was very happy with how this turned out. Jacob and I brainstormed and analyzed a lot, and when time came to code the project and write this README, we really did a great job of filling in eachothers' gaps. 
 
 ### Jacob
