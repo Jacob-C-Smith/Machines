@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "tm",
+            "request": "launch",
+            "mainClass": "tm",
+            "projectName": "PR1_fa3aa615"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
